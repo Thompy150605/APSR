@@ -1,0 +1,69 @@
+% Main_MoSTresca.m
+% Calculates MoS and displays a Named Table
+
+% --- 1. CAPTURE THE SECTION INDEX ---
+% We capture 'i' from Main.m immediately before it gets overwritten.
+if exist('i', 'var') && ~isempty(i)
+    currentIdx = i;
+else
+    currentIdx = 1; % Default if running standalone
+end
+
+% Hardcoded names
+fixedNames = {'Root Exposed', 'Hardpoint 1', 'Hardpoint 2'};
+
+% Determine Title safely using currentIdx (NOT i)
+if currentIdx <= length(fixedNames)
+    tableTitle = fixedNames{currentIdx};
+else
+    tableTitle = sprintf('Section %d', currentIdx);
+end
+
+% --- 2. CALCULATE MOS (Using 'k' loop to protect 'i') ---
+fail = false;
+clear Mate thicc 
+
+% CRITICAL FIX: Changed loop variable from 'i' to 'k'
+for k = 1:length(w)
+    sigma_all = w(k).material.sigmaY/1.5;
+    
+    if ~isnan(w(k).sigma)
+        S = sqrt(w(k).sigma^2 + 3*w(k).tau^2);
+    else
+        S = sqrt(3*w(k).tau^2);
+    end
+    
+    w(k).MoSTresca = sigma_all/S - 1;
+    
+    % Check Failure
+    if w(k).MoSTresca < 0
+       fail = true; 
+    end
+    
+    % Collect Data
+    Mate(k) = w(k).material;
+    thicc(k) = w(k).t;
+end
+
+% --- 3. GENERATE TABLE ---
+MoSCompile = [w.name; thicc; Mate.name; w.sigma; w.tau; w.MoSTresca; w.MoSBuckle]';
+MoStable = array2table(MoSCompile, 'VariableNames', ...
+    {'Wall','Thickness','Material','Normal(MPa)','Shear(MPa)','MoS_Tresca','MoS_Buckle'});
+
+% --- 4. DISPLAY UI FIGURE ---
+% Use currentIdx for positioning so they stack nicely
+x_pos = 100 + (currentIdx * 50);
+y_pos = 500 - (currentIdx * 50); % This will now be valid (e.g. 450, 400, 350)
+
+fig = uifigure('Name', sprintf('Result: %s', tableTitle), ...
+    'Position', [x_pos, y_pos, 760, 360]);
+
+MoStableUI = uitable(fig, 'Data', MoStable, 'Position', [20 20 720 320]);
+
+% Warnings
+if fail == true
+   warning('Struktur fail: Tresca Criterion at %s', tableTitle) 
+end
+if min([w.MoSBuckle]) < 0
+   warning('Struktur fail: Buckle at %s', tableTitle) 
+end

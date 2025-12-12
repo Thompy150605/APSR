@@ -5,7 +5,7 @@ end
 
 % --- Thickness Inputs ---
 t_skin  = 2.3;   % Skin Thickness
-t_spar  = 2.5;   % Spar Web Thickness
+t_spar  = 100;   % Spar Web Thickness
 
 % Set 't' for AutoWall default
 t = t_skin; 

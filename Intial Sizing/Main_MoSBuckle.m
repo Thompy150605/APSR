@@ -18,7 +18,3 @@ for i = 1:length(w)
        fail = true; 
     end
 end
-
-if fail == true
-   warning('Struktur fail: Buckle') 
-end
