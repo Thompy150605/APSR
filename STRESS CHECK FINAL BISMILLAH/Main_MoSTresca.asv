@@ -1,0 +1,36 @@
+%semua satuan MPa
+
+for j = 1:length(c_section)
+    fail = false;
+    Stat = {};
+    for i = 1:length(w)
+        sigma_all = w(i,j).material.sigmaY/1.5;
+        if isnan(w(i,j).sigma) ~= true
+            S = sqrt(w(i,j).sigma^2+3*w(i,j).tau^2);
+            w(i,j).MoSTresca = sigma_all/S - 1;   
+        else
+            S = sqrt(3*w(i,j).tau^2);
+            w(i,j).MoSTresca = sigma_all/S - 1;  
+        end
+        
+        if w(i,j).MoSTresca < 0
+           fail = true;
+           Stat{1,i} = 'Fail';
+        else
+           Stat{1,i} = 'Safe';
+        end
+        Mate(i) = w(i,j).material;
+        thicc(i) = cell2mat(t_section(j));
+    end
+    
+    if fail == true
+       warning('Struktur fail: Tresca Criterion') 
+    end
+    
+    MoSCompile = [w(:,j).name ;thicc; Mate.name ; w(:,j).MoSTresca ; Stat]';
+    MoStable = array2table(MoSCompile, 'VariableNames',{'Wall','Skin thickness','Material','MoS Von Misces', 'Status'});
+    
+    fig = uifigure("Position",[500 500 760 360]);
+    MoStableUI =  uitable(fig,"Data",MoStable,"Position",[20 20 720 320]);
+    safe_back = uistyle("BackgroundColor","green");
+end
