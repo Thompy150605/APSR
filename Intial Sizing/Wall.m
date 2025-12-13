@@ -12,7 +12,8 @@ classdef Wall
         sigma double = NaN %normal stress dalam MPa (ambil dari titik dengan sigma terbesar)
         sigmaCrit(1,1) double = NaN %normal stress crit karena buckle
         tauCrit(1,1) double = NaN %shear stress crit karena buckles 
-        MoSTresca(1,1) double = NaN %margin of safety Tresca Criterion
+        MoSTresca(1,1) double = NaN     % Margin of Safety Tresca Criterion(sqrt(sig^2 + 4tau^2))
+        MoSVonMises(1,1) double = NaN   % Margin of Safety Von Mises Criterion(sqrt(sig^2 + 3tau^2))
         MoSBuckle(1,1) double = NaN %margin of safety buckle
         material Material
     end

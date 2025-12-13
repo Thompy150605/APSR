@@ -25,9 +25,7 @@ M_ref = rawData(:, 2);
 V_ref = rawData(:, 3);
 T_ref = rawData(:, 4);
 
-% ==========================================
-% 2. ANALYSIS LOOP
-% ==========================================
+
 for i = 1:length(locations)
     % A. Set Variables for this Section
     y_location = locations(i);
@@ -52,10 +50,32 @@ for i = 1:length(locations)
     Main_ShearFlow      
     Main_BendingMoment  
     Main_Buckle1        
-    Main_Buckle2        % <--- Contains the NaN fix
-    Main_MoSTresca      % <--- Generates the named Table
-    Main_MoSBuckle      
+    Main_Buckle2  
+    Main_MoSBuckle
     
+    fprintf('------------------------------------------------\n');
+    fprintf('Select Failure Criterion for Analysis:\n');
+    fprintf('1. Tresca Criterion (Conservative)\n');
+    fprintf('2. Von Mises Criterion (More Accurate)\n');
+    fprintf('------------------------------------------------\n');
+    crit_choice = input('Enter your choice (1 or 2): ');
+
+    if crit_choice ~= 1 && crit_choice ~= 2
+        error('Invalid input! Please restart and choose 1 or 2.');
+    end
+
+    if crit_choice == 1
+        % Run Tresca
+        Main_MoSTresca
+        % Optionally visualize Tresca specific plots if you have them
+        % Visualisasi_MoSTresca; 
+    elseif crit_choice == 2
+        % Run Von Mises (Ensure you have created Main_MoSVonMises.m)
+        Main_MoSVonMises
+        % Optionally visualize Von Mises specific plots
+        % Visualisasi_MoSVonMises;
+    end
+
 end
 
 fprintf('\nAll sections analyzed. Check the 3 pop-up windows.\n');

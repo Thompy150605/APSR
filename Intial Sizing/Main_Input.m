@@ -5,7 +5,7 @@ end
 
 % --- Thickness Inputs ---
 t_skin  = 2.3;   % Skin Thickness
-t_spar  = 100;   % Spar Web Thickness
+t_spar  = 2.5;   % Spar Web Thickness
 
 % Set 't' for AutoWall default
 t = t_skin; 
@@ -30,7 +30,7 @@ x_locs = linspace(20, 75, 14);
 % x_locs(2:13) are the 12 Stringers
 str_loc = x_locs(2:13); 
 
-% --- DEFINISI TITIK (POINTS) - 12 STRINGERS ---
+% --- DEFINISI TITIK (POINTS) - 12 STRINGERS (MUST DEFINE YOURSELF) ---
 p = [ ...
     % 1. Front Spar Upper (20%)
     Point('1', c * NACA63415(20, 1), Al7075, A_sparf);
@@ -122,7 +122,6 @@ rs_u_pt = findP(p, '2'); % Rear Spar Upper
 rs_l_pt = findP(p, '3'); % Rear Spar Lower
 
 % 2. Calculate Dimensions
-% Assumption: Your Point class uses .x and .y for coordinates
 % h1 = Front Spar Height (Vertical distance)
 h1 = fs_u_pt.y - fs_l_pt.y;
 
