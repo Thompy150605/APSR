@@ -1,0 +1,204 @@
+DaftarMaterial
+if exist('c','var') == false
+   c = 2.635744312; % Chord Root default
+end
+
+% Iteration 3 - Changing The Spar Configuration (Front and Rear Spar)
+
+% Skin Thickness
+t_skin_upper = 2.5; 
+t_skin_lower = 2.1; 
+
+% Webs: Front spar takes ~70-80% of shear load, so it must be thicker.
+t_spar_front = 4.65; 
+t_spar_rear  = 2.4; 
+
+% --- 2. STRINGER GEOMETRY (Z-STRINGER) ---
+% Z-Stringer is standard for this class. 
+% Calculation: Area = thickness * (Web_Height + Top_Flange + Bottom_Flange)
+h_st = 62;            % Height (mm)
+w_st_flange = 31;     % Flange Width (mm) ~ 0.4 * h
+t_st = 3;           % Stringer Thickness (mm)
+
+% Z-Stringer Area Calculation
+A_st = t_st * (h_st + 2 * w_st_flange); 
+
+% --- 3. SPAR CAP GEOMETRY (Extruded L/T Sections) ---
+% Front Spar Cap
+w_f_cap = 128;         % Width effective (mm)
+t_f_cap = 3;          % Thickness effective (mm)
+A_sparf = w_f_cap * t_f_cap; % Area ~520 mm^2
+
+% Rear Spar Cap
+w_r_cap = 62;         % Width effective (mm)
+t_r_cap = 3;          % Thickness effective (mm)
+A_sparr = w_r_cap * t_r_cap; % Area ~270 mm^2
+
+% --- LOCATIONS ---
+x_locs = linspace(20, 75, 14); 
+str_loc = x_locs(2:13); 
+
+% --- DEFINISI TITIK (POINTS) - 12 STRINGERS ---
+% Material Assignment:
+% Upper Surface (Compression) -> Al7075-T6 (Stronger Yield)
+% Lower Surface (Tension)     -> Al2024-T3 (Better Fatigue Life)
+
+p = [ ...
+    % 1. Front Spar Upper (20%)
+    Point('1', c * NACA63415(20, 1), Al7075, A_sparf);
+    
+    % --- 12 UPPER STRINGERS (Al7075) ---
+    Point('s1_u',  c * NACA63415(str_loc(1), 1), Al7075, A_st);
+    Point('s2_u',  c * NACA63415(str_loc(2), 1), Al7075, A_st);
+    Point('s3_u',  c * NACA63415(str_loc(3), 1), Al7075, A_st);
+    Point('s4_u',  c * NACA63415(str_loc(4), 1), Al7075, A_st);
+    Point('s5_u',  c * NACA63415(str_loc(5), 1), Al7075, A_st);
+    Point('s6_u',  c * NACA63415(str_loc(6), 1), Al7075, A_st);
+    Point('s7_u',  c * NACA63415(str_loc(7), 1), Al7075, A_st);
+    Point('s8_u',  c * NACA63415(str_loc(8), 1), Al7075, A_st);
+    Point('s9_u',  c * NACA63415(str_loc(9), 1), Al7075, A_st);
+    Point('s10_u', c * NACA63415(str_loc(10), 1), Al7075, A_st);
+    Point('s11_u', c * NACA63415(str_loc(11), 1), Al7075, A_st);
+    Point('s12_u', c * NACA63415(str_loc(12), 1), Al7075, A_st);
+    
+    % 2. Rear Spar Upper (75%)
+    Point('2', c * NACA63415(75, 1), Al7075, A_sparr);
+    
+    % 3. Rear Spar Lower (75%)
+    Point('3', c * NACA63415(75, -1), Al7075, A_sparr);
+    
+    % --- 12 LOWER STRINGERS (Al2024) ---
+    Point('s12_l', c * NACA63415(str_loc(12), -1), Al2024, A_st);
+    Point('s11_l', c * NACA63415(str_loc(11), -1), Al2024, A_st);
+    Point('s10_l', c * NACA63415(str_loc(10), -1), Al2024, A_st);
+    Point('s9_l',  c * NACA63415(str_loc(9), -1), Al2024, A_st);
+    Point('s8_l',  c * NACA63415(str_loc(8), -1), Al2024, A_st);
+    Point('s7_l',  c * NACA63415(str_loc(7), -1), Al2024, A_st);
+    Point('s6_l',  c * NACA63415(str_loc(6), -1), Al2024, A_st);
+    Point('s5_l',  c * NACA63415(str_loc(5), -1), Al2024, A_st);
+    Point('s4_l',  c * NACA63415(str_loc(4), -1), Al2024, A_st);
+    Point('s3_l',  c * NACA63415(str_loc(3), -1), Al2024, A_st);
+    Point('s2_l',  c * NACA63415(str_loc(2), -1), Al2024, A_st);
+    Point('s1_l',  c * NACA63415(str_loc(1), -1), Al2024, A_st);
+    
+    % 4. Front Spar Lower (20%)
+    Point('4', c * NACA63415(20, -1), Al7075, A_sparf);
+];
+
+% --- DEFINISI WALL (MANUAL DEFINITION) ---
+w = [
+    % --- UPPER SKIN (Al7075 - Compression) ---
+    Wall('1_s1u',   findP(p,'1'),     findP(p,'s1_u'),  Al7075, t_skin_upper);
+    Wall('s1u_s2u', findP(p,'s1_u'),  findP(p,'s2_u'),  Al7075, t_skin_upper);
+    Wall('s2u_s3u', findP(p,'s2_u'),  findP(p,'s3_u'),  Al7075, t_skin_upper);
+    Wall('s3u_s4u', findP(p,'s3_u'),  findP(p,'s4_u'),  Al7075, t_skin_upper);
+    Wall('s4u_s5u', findP(p,'s4_u'),  findP(p,'s5_u'),  Al7075, t_skin_upper);
+    Wall('s5u_s6u', findP(p,'s5_u'),  findP(p,'s6_u'),  Al7075, t_skin_upper);
+    Wall('s6u_s7u', findP(p,'s6_u'),  findP(p,'s7_u'),  Al7075, t_skin_upper);
+    Wall('s7u_s8u', findP(p,'s7_u'),  findP(p,'s8_u'),  Al7075, t_skin_upper);
+    Wall('s8u_s9u', findP(p,'s8_u'),  findP(p,'s9_u'),  Al7075, t_skin_upper);
+    Wall('s9u_s10u',findP(p,'s9_u'),  findP(p,'s10_u'), Al7075, t_skin_upper);
+    Wall('s10u_s11u',findP(p,'s10_u'),findP(p,'s11_u'), Al7075, t_skin_upper);
+    Wall('s11u_s12u',findP(p,'s11_u'),findP(p,'s12_u'), Al7075, t_skin_upper);
+    Wall('s12u_2',  findP(p,'s12_u'), findP(p,'2'),     Al7075, t_skin_upper);
+    
+    % --- REAR SPAR WEB (Al7075 - Thinner) ---
+    Wall('rear_web', findP(p,'2'),    findP(p,'3'),     Al7075, t_spar_rear);
+    
+    % --- LOWER SKIN (Al2024 - Tension/Fatigue) ---
+    Wall('3_s12l',   findP(p,'3'),     findP(p,'s12_l'), Al2024, t_skin_lower);
+    Wall('s12l_s11l',findP(p,'s12_l'), findP(p,'s11_l'), Al2024, t_skin_lower);
+    Wall('s11l_s10l',findP(p,'s11_l'), findP(p,'s10_l'), Al2024, t_skin_lower);
+    Wall('s10l_s9l', findP(p,'s10_l'), findP(p,'s9_l'),  Al2024, t_skin_lower);
+    Wall('s9l_s8l',  findP(p,'s9_l'),  findP(p,'s8_l'),  Al2024, t_skin_lower);
+    Wall('s8l_s7l',  findP(p,'s8_l'),  findP(p,'s7_l'),  Al2024, t_skin_lower);
+    Wall('s7l_s6l',  findP(p,'s7_l'),  findP(p,'s6_l'),  Al2024, t_skin_lower);
+    Wall('s6l_s5l',  findP(p,'s6_l'),  findP(p,'s5_l'),  Al2024, t_skin_lower);
+    Wall('s5l_s4l',  findP(p,'s5_l'),  findP(p,'s4_l'),  Al2024, t_skin_lower);
+    Wall('s4l_s3l',  findP(p,'s4_l'),  findP(p,'s3_l'),  Al2024, t_skin_lower);
+    Wall('s3l_s2l',  findP(p,'s3_l'),  findP(p,'s2_l'),  Al2024, t_skin_lower);
+    Wall('s2l_s1l',  findP(p,'s2_l'),  findP(p,'s1_l'),  Al2024, t_skin_lower);
+    Wall('s1l_4',    findP(p,'s1_l'),  findP(p,'4'),     Al2024, t_skin_lower);
+    
+    % --- FRONT SPAR WEB (Al7075 - Thicker for Shear) ---
+    Wall('front_web', findP(p,'4'),    findP(p,'1'),     Al7075, t_spar_front);
+];
+
+% --- DEFINISI LOOP ---
+loop = [Loop(1:length(p), p, w)];
+
+% --- VISUALISASI ---
+close all
+figure(1)
+hold on
+for i=1:length(p) 
+    p(i).plot();
+    % Use smaller text for clarity if crowded
+    text(p(i).x, p(i).y, p(i).name, 'FontSize', 8, 'HorizontalAlignment', 'center', 'VerticalAlignment', 'bottom');
+end
+for i=1:length(w) 
+    w(i).plot();
+end
+axis equal
+grid on
+title('Wing Box Cross Section (Optimized for COIN)');
+
+%% DIMENSION REPORT
+fs_u_pt = findP(p, '1'); fs_l_pt = findP(p, '4');
+rs_u_pt = findP(p, '2'); rs_l_pt = findP(p, '3');
+
+h1 = fs_u_pt.y - fs_l_pt.y;
+h2 = rs_u_pt.y - rs_l_pt.y;
+width_box = rs_u_pt.x - fs_u_pt.x;
+
+fprintf('\n=== OPTIMIZED STRUCTURAL CONFIGURATION ===\n');
+fprintf('Stringer Type   : Z-Stringer (h=%d mm, t=%.1f mm)\n', h_st, t_st);
+fprintf('Stringer Area   : %.2f mm^2 (per stringer)\n', A_st);
+fprintf('Skin Thickness  : %.2f mm (Upper/Lower)\n', t_skin_upper);
+fprintf('Spar Web Thick  : Front=%.1f mm, Rear=%.1f mm\n', t_spar_front, t_spar_rear);
+fprintf('-----------------------------------------\n');
+fprintf('Est. Linear Mass Density (at this section)\n');
+fprintf('Checking against target...\n');
+% Quick Mass Estimator to help user verify
+TotalArea_mm2 = sum([p.area]) + sum([w.area])/1000; % w.area is already volume-ish in class, roughly
+% Re-calculate properly:
+M_linear = 0;
+for i=1:length(p), M_linear = M_linear + p(i).area*1e-6*p(i).material.rho; end
+for i=1:length(w), M_linear = M_linear + w(i).t*w(i).length*1e-3*w(i).material.rho; end
+fprintf('Linear Mass     : %.2f kg/m\n', M_linear);
+fprintf('=========================================\n');
+
+%% --- ESDU 71014 PARAMETER CHECK ---
+% Calculate Average Stringer Pitch (b)
+% Total width of box = Rear Spar X - Front Spar X
+box_width_mm = (p(14).x - p(1).x) * 1000; % Points 2 and 1 are indices 14 and 1 in your manual list? 
+% Actually, based on your manual definition:
+% Point '1' is index 1. Point '2' is index 14.
+% Note: Ensure indices match your 'p' array order.
+% In your provided code:
+% p(1) is '1' (Front Spar Upper)
+% p(14) is '2' (Rear Spar Upper)
+
+width_box_real = (findP(p,'2').x - findP(p,'1').x) * 1000; % Convert m to mm
+
+% Number of bays = Number of Upper Stringers + 1 (if skin is between them)
+% Your loop creates walls: 1->s1, s1->s2 ... s12->2.
+% Total walls = 13.
+num_bays = 13; 
+
+b_avg = width_box_real / num_bays;
+
+% Calculate Ratios
+ratio_h_b = h_st / b_avg;       % h/b
+ratio_d_h = w_st_flange / h_st; % d/h
+ratio_ts_t = t_st / t_skin_upper; % ts/t
+
+fprintf('\n=== ESDU 71014 CHECK PARAMETERS ===\n');
+fprintf('Stringer Pitch (b) : %.2f mm (Average)\n', b_avg);
+fprintf('Stringer Height (h): %.2f mm\n', h_st);
+fprintf('Flange Width (d)   : %.2f mm\n', w_st_flange);
+fprintf('-----------------------------------------\n');
+fprintf('h/b  = %.4f\n', ratio_h_b);
+fprintf('d/h  = %.4f\n', ratio_d_h);
+fprintf('ts/t = %.4f\n', ratio_ts_t);
+fprintf('=========================================\n');

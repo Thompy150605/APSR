@@ -1,18 +1,18 @@
 clear all
-close all
+% close all
 clc
 
 % ==========================================
 % 1. DEFINISI LOKASI (Fine Tuned Parameters)
 % ==========================================
 % Locations: Root Exposed, Hardpoint 1, Hardpoint 2
-locations = [0.47045, 2.04, 3.15]; 
+locations = 0.47045; % [0.47045, 2.04, 3.15]
 loc_names = {'Root Exposed', 'Hardpoint 1', 'Hardpoint 2'};
 
 % Wing Geometry (For automatic Chord calc)
 c_root = 2.76;   
-c_tip  = 1.13;   
-b_semi = 6.18;   
+c_tip  = 1.1;   
+b_semi = 6.285;   
 
 % Load Data Source (Ensure MomentData.csv is in the folder)
 dataFilename = 'LoadData.csv'; 
@@ -45,36 +45,37 @@ for i = 1:length(locations)
     fprintf('Running Analysis: %s (y=%.2fm)...\n', loc_name, y_location);
     
     % D. Run Calculation Scripts
-    Main_Input          
+    Main_Input3          
     Main_IdealisasiLuas 
     Main_ShearFlow      
     Main_BendingMoment  
-    Main_Buckle1        
+    Main_Buckle1  
+    % Main_Buckle1_Auto
     Main_Buckle2  
     Main_MoSBuckle
-    
-    fprintf('------------------------------------------------\n');
-    fprintf('Select Failure Criterion for Analysis:\n');
-    fprintf('1. Tresca Criterion (Conservative)\n');
-    fprintf('2. Von Mises Criterion (More Accurate)\n');
-    fprintf('------------------------------------------------\n');
-    crit_choice = input('Enter your choice (1 or 2): ');
-
-    if crit_choice ~= 1 && crit_choice ~= 2
-        error('Invalid input! Please restart and choose 1 or 2.');
-    end
-
-    if crit_choice == 1
-        % Run Tresca
-        Main_MoSTresca
-        % Optionally visualize Tresca specific plots if you have them
-        % Visualisasi_MoSTresca; 
-    elseif crit_choice == 2
-        % Run Von Mises (Ensure you have created Main_MoSVonMises.m)
-        Main_MoSVonMises
-        % Optionally visualize Von Mises specific plots
-        % Visualisasi_MoSVonMises;
-    end
+    Main_MoSVonMises
+    % fprintf('------------------------------------------------\n');
+    % fprintf('Select Failure Criterion for Analysis:\n');
+    % fprintf('1. Tresca Criterion (Conservative)\n');
+    % fprintf('2. Von Mises Criterion (More Accurate)\n');
+    % fprintf('------------------------------------------------\n');
+    % crit_choice = input('Enter your choice (1 or 2): ');
+    % 
+    % if crit_choice ~= 1 && crit_choice ~= 2
+    %     error('Invalid input! Please restart and choose 1 or 2.');
+    % end
+    % 
+    % if crit_choice == 1
+    %     % Run Tresca
+    %     Main_MoSTresca
+    %     % Optionally visualize Tresca specific plots if you have them
+    %     % Visualisasi_MoSTresca; 
+    % elseif crit_choice == 2
+    %     % Run Von Mises (Ensure you have created Main_MoSVonMises.m)
+    %     Main_MoSVonMises
+    %     % Optionally visualize Von Mises specific plots
+    %     % Visualisasi_MoSVonMises;
+    % end
 
 end
 

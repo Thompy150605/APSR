@@ -1,18 +1,20 @@
 %semua satuan MPa
 
 fail = false;
-for i = 1:length(w)
-    sigma_all = w(i).material.sigmaY/1.5;
-    if isnan(w(i).sigma) ~= true
-        S = sqrt(w(i).sigma^2+3*w(i).tau^2);
-        w(i).MoSTresca = sigma_all/S - 1;   
+for z = 1:length(w)
+    sigma_all = w(z).material.sigmaY/1.5;
+    if isnan(w(z).sigma) ~= true
+        S = sqrt(w(z).sigma^2 + 4*w(z).tau^2); 
+        w(z).MoSTresca = sigma_all/S - 1;   
     else
-        S = sqrt(3*w(i).tau^2);
-        w(i).MoSTresca = sigma_all/S - 1;  
+        S = sqrt(4*w(z).tau^2); 
+        w(z).MoSTresca = sigma_all/S - 1;  
     end
     
+    if w(z).MoSTresca < 0
+       fail = true; 
+    end
     
-
 %         if w(i).MoSTresca < 0
 %            fail = true;
 %            Stat(i,1) = 'Fail';
@@ -21,7 +23,7 @@ for i = 1:length(w)
 %         end
         Mate(i) = w(i).material;
         thicc(i) = w(i).t;
-    end
+end
     
     if fail == true
        warning('Struktur fail: Tresca Criterion') 
@@ -43,7 +45,6 @@ for i = 1:length(w)
     lbl.Position = [20, 360, 720, 30];
     MoStableUI =  uitable(fig,"Data",MoStable,"Position",[20 20 720 320]);
     safe_back = uistyle("BackgroundColor","green");
-
 
 if fail == true
    warning('Struktur fail: Tresca Criterion') 

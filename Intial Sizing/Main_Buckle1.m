@@ -16,13 +16,13 @@ for i = [1:2 24:27] %1.8
 end
 %}
 
-%kasus 2
-for i = 1:length(w)%t = 2
-   K(i) = 5.25; 
-end
-for i = [1:2 15:17] %t = 1.5
-   K(i) = 5.75;
-end
+% %kasus 2
+% for i = 1:length(w)%t = 2
+%    K(i) = 5.25; 
+% end
+% for i = [1:2 15:17] %t = 1.5
+%    K(i) = 5.75;
+% end
 
 
 %{
@@ -31,6 +31,12 @@ for i = 1:length(w)%t = 2
    K(i) = 4.25; 
 end
 %}
+
+% Scheck 3
+for i = 1:length(w)
+   K(i) = 6.12; %4.95
+end
+
 for i = 1:length(w)
     if isnan(w(i).sigma) ~= true
         w(i).sigmaCrit = K(i)*w(i).material.E*(w(i).t/w(i).length/1000)^2*10^3; % nnti ubah ke K(i) lagi

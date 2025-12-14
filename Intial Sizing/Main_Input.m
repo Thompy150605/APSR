@@ -4,10 +4,10 @@ if exist('c','var') == false
 end
 
 % --- Thickness Inputs ---
-t_skin  = 2.3;   % Skin Thickness
+t_skin  = 2.3;   % Skin Thickness (Applied to both Upper and Lower)
 t_spar  = 2.5;   % Spar Web Thickness
 
-% Set 't' for AutoWall default
+% Set 't' for reference if needed
 t = t_skin; 
 
 % --- Area Definitions ---
@@ -30,7 +30,7 @@ x_locs = linspace(20, 75, 14);
 % x_locs(2:13) are the 12 Stringers
 str_loc = x_locs(2:13); 
 
-% --- DEFINISI TITIK (POINTS) - 12 STRINGERS (MUST DEFINE YOURSELF) ---
+% --- DEFINISI TITIK (POINTS) - 12 STRINGERS ---
 p = [ ...
     % 1. Front Spar Upper (20%)
     Point('1', c * NACA63415(20, 1), Al7075, A_sparf);
@@ -55,7 +55,8 @@ p = [ ...
     % 3. Rear Spar Lower (75%)
     Point('3', c * NACA63415(75, -1), Al7075, A_sparr);
     
-    % --- 12 LOWER STRINGERS (Urutan Mundur: Rear -> Front) ---
+    % --- 12 LOWER STRINGERS (Reverse Order: Rear -> Front) ---
+    % Note: Lower Stringer points set to Al2024 to match skin
     Point('s12_l', c * NACA63415(str_loc(12), -1), Al2024, A_st);
     Point('s11_l', c * NACA63415(str_loc(11), -1), Al2024, A_st);
     Point('s10_l', c * NACA63415(str_loc(10), -1), Al2024, A_st);
@@ -73,23 +74,49 @@ p = [ ...
     Point('4', c * NACA63415(20, -1), Al7075, A_sparf);
 ];
 
-% --- DEFINISI WALL (Single Cell) ---
-w = [AutoWall(p, Al2024, t_skin)]; 
+% --- DEFINISI WALL (MANUAL DEFINITION) ---
+% Upper Skin: Al7075 (High Compressive Strength)
+% Lower Skin: Al2024 (High Fatigue Resistance/Tension)
+% Webs: Al7075 (High Strength)
 
-% Update Thickness for Spar Webs
-% LOGIKA INDEKS BARU (12 Stringers):
-% Urutan P: 
-% 1 (FS_U) 
-% + 12 Stringers (Index 2-13) 
-% + 1 (RS_U / Index 14)
-% 
-% Wall ke-14 menghubungkan Point 14 (RS_U) ke Point 15 (RS_L).
-w(14).t = t_spar; 
-w(14).name = 'rear_web';
+w = [
+    % --- UPPER SKIN (Front to Rear) - Al7075 ---
+    Wall('1_s1u',   findP(p,'1'),     findP(p,'s1_u'),  Al7075, t_skin);
+    Wall('s1u_s2u', findP(p,'s1_u'),  findP(p,'s2_u'),  Al7075, t_skin);
+    Wall('s2u_s3u', findP(p,'s2_u'),  findP(p,'s3_u'),  Al7075, t_skin);
+    Wall('s3u_s4u', findP(p,'s3_u'),  findP(p,'s4_u'),  Al7075, t_skin);
+    Wall('s4u_s5u', findP(p,'s4_u'),  findP(p,'s5_u'),  Al7075, t_skin);
+    Wall('s5u_s6u', findP(p,'s5_u'),  findP(p,'s6_u'),  Al7075, t_skin);
+    Wall('s6u_s7u', findP(p,'s6_u'),  findP(p,'s7_u'),  Al7075, t_skin);
+    Wall('s7u_s8u', findP(p,'s7_u'),  findP(p,'s8_u'),  Al7075, t_skin);
+    Wall('s8u_s9u', findP(p,'s8_u'),  findP(p,'s9_u'),  Al7075, t_skin);
+    Wall('s9u_s10u',findP(p,'s9_u'),  findP(p,'s10_u'), Al7075, t_skin);
+    Wall('s10u_s11u',findP(p,'s10_u'),findP(p,'s11_u'), Al7075, t_skin);
+    Wall('s11u_s12u',findP(p,'s11_u'),findP(p,'s12_u'), Al7075, t_skin);
+    Wall('s12u_2',  findP(p,'s12_u'), findP(p,'2'),     Al7075, t_skin);
+    
+    % --- REAR SPAR WEB - Al7075 ---
+    Wall('rear_web', findP(p,'2'),    findP(p,'3'),     Al7075, t_spar);
+    
+    % --- LOWER SKIN (Rear to Front) - Al2024 ---
+    Wall('3_s12l',   findP(p,'3'),     findP(p,'s12_l'), Al2024, t_skin);
+    Wall('s12l_s11l',findP(p,'s12_l'), findP(p,'s11_l'), Al2024, t_skin);
+    Wall('s11l_s10l',findP(p,'s11_l'), findP(p,'s10_l'), Al2024, t_skin);
+    Wall('s10l_s9l', findP(p,'s10_l'), findP(p,'s9_l'),  Al2024, t_skin);
+    Wall('s9l_s8l',  findP(p,'s9_l'),  findP(p,'s8_l'),  Al2024, t_skin);
+    Wall('s8l_s7l',  findP(p,'s8_l'),  findP(p,'s7_l'),  Al2024, t_skin);
+    Wall('s7l_s6l',  findP(p,'s7_l'),  findP(p,'s6_l'),  Al2024, t_skin);
+    Wall('s6l_s5l',  findP(p,'s6_l'),  findP(p,'s5_l'),  Al2024, t_skin);
+    Wall('s5l_s4l',  findP(p,'s5_l'),  findP(p,'s4_l'),  Al2024, t_skin);
+    Wall('s4l_s3l',  findP(p,'s4_l'),  findP(p,'s3_l'),  Al2024, t_skin);
+    Wall('s3l_s2l',  findP(p,'s3_l'),  findP(p,'s2_l'),  Al2024, t_skin);
+    Wall('s2l_s1l',  findP(p,'s2_l'),  findP(p,'s1_l'),  Al2024, t_skin);
+    Wall('s1l_4',    findP(p,'s1_l'),  findP(p,'4'),     Al2024, t_skin);
+    
+    % --- FRONT SPAR WEB - Al7075 ---
+    Wall('front_web', findP(p,'4'),    findP(p,'1'),     Al7075, t_spar);
+];
 
-% Wall Terakhir (end): Menghubungkan Point Terakhir (FS_L) ke Point Awal (FS_U)
-w(end).t = t_spar;
-w(end).name = 'front_web';
 
 % --- DEFINISI LOOP (CELL) ---
 % Single Loop containing all points
@@ -115,20 +142,14 @@ grid on
 
 %% h1, h2, w value
 % 1. Retrieve the Spar Points
-% We find the point objects by their names
 fs_u_pt = findP(p, '1'); % Front Spar Upper
 fs_l_pt = findP(p, '4'); % Front Spar Lower
 rs_u_pt = findP(p, '2'); % Rear Spar Upper
 rs_l_pt = findP(p, '3'); % Rear Spar Lower
 
 % 2. Calculate Dimensions
-% h1 = Front Spar Height (Vertical distance)
 h1 = fs_u_pt.y - fs_l_pt.y;
-
-% h2 = Rear Spar Height (Vertical distance)
 h2 = rs_u_pt.y - rs_l_pt.y;
-
-% w = Width (Horizontal distance between Rear Spar and Front Spar)
 width_box = rs_u_pt.x - fs_u_pt.x;
 
 % 3. Print Results
