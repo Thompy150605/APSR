@@ -6,7 +6,7 @@ clc
 % 1. DEFINISI LOKASI (Fine Tuned Parameters)
 % ==========================================
 % Locations: Root Exposed, Hardpoint 1, Hardpoint 2
-locations = 0.47045; % [0.47045, 2.04, 3.15]
+locations = [0.47045, 2.04, 3.15];
 loc_names = {'Root Exposed', 'Hardpoint 1', 'Hardpoint 2'};
 
 % Wing Geometry (For automatic Chord calc)
@@ -45,7 +45,7 @@ for i = 1:length(locations)
     fprintf('Running Analysis: %s (y=%.2fm)...\n', loc_name, y_location);
     
     % D. Run Calculation Scripts
-    Main_Input3          
+    Main_Input_Auto          
     Main_IdealisasiLuas 
     Main_ShearFlow      
     Main_BendingMoment  
